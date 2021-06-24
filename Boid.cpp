@@ -47,12 +47,6 @@ void Boid::update()
 
 	position += velocity;
 
-    // Conform to toroidal geometry
-    float x = fmod(position.x + WORLD_WIDTH, WORLD_WIDTH);
-    float y = fmod(position.y + WORLD_HEIGHT, WORLD_HEIGHT);
-
-    position = sf::Vector2f(x, y);
-
     // Reset acceleration to 0 vector before next update
     acceleration = sf::Vector2f(0.0f, 0.0f);
 }
@@ -72,7 +66,7 @@ void Boid::align(const std::vector<Boid*>& boids)
         if (boid == this)
             continue;
         
-        float dist = VectorFunctions::toroidalDistance(this->getPosition(), boid->getPosition(), WORLD_WIDTH, WORLD_HEIGHT);
+        float dist = VectorFunctions::length(this->getPosition() - boid->getPosition());
 
         if (dist < PERCEPTION_RADIUS)
         {
@@ -101,7 +95,7 @@ void Boid::cohese(const std::vector<Boid*>& boids)
         if (boid == this)
             continue;
 
-        sf::Vector2f disp = VectorFunctions::toroidalDirection(this->getPosition(), boid->getPosition(), WORLD_WIDTH, WORLD_HEIGHT);
+        sf::Vector2f disp = boid->getPosition() - this->getPosition();
 
         if (VectorFunctions::length(disp) < PERCEPTION_RADIUS)
         {
@@ -130,14 +124,14 @@ void Boid::separate(const std::vector<Boid*>& boids)
         if (boid == this)
             continue;
 
-        sf::Vector2f disp = VectorFunctions::toroidalDirection(this->getPosition(), boid->getPosition(), WORLD_WIDTH, WORLD_HEIGHT);
+        sf::Vector2f disp = boid->getPosition() - this->getPosition();
 
         if (VectorFunctions::length(disp) < AVOIDANCE_RADIUS)
         {
             neighbours++;
-            avg_pos -= disp;
+            avg_pos -= (disp / VectorFunctions::length(disp) / VectorFunctions::length(disp));
         }
     }
 
-    accelerate(0.02f * avg_pos);
+    accelerate(2.0f * avg_pos);
 }

@@ -60,7 +60,7 @@ int main()
         rect.setFillColor(sf::Color::Magenta);
         window.draw(rect);
 
-        // Update boids
+        // Apply rules to boids
         for (auto boid : boids)
         {
             boid->align(boids);
@@ -68,7 +68,7 @@ int main()
             boid->separate(boids);
         }
 
-        // Draw boids
+        // Update and draw boids
         for (auto boid : boids)
         {
             boid->update();
